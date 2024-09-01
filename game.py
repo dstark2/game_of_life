@@ -9,7 +9,7 @@ GRID_SIZE = 50
 PROB_ALIVE = 0.2
 
 # Number of generations to simulate
-GENERATIONS = 1000
+GENERATIONS = 10000
 
 def initialize_grid(size, prob_alive):
     grid = np.random.choice([0, 1], size*size, p=[1-prob_alive, prob_alive]).reshape(size, size)
