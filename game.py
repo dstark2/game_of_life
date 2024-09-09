@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import time
 
 # Define the dimensions of the grid
 GRID_SIZE = 50
@@ -41,13 +42,33 @@ def run_simulation(grid_size, prob_alive, generations):
     stable_generation = None  # To store the generation number when stability is reached
 
     fig, ax = plt.subplots(figsize=(10, 10))
+
+    # Set background colors to be transparent
+    fig.patch.set_facecolor('none')
+    ax.set_facecolor('none')
+
+    # Add grid lines with yellow color
+    ax.set_xticks(np.arange(-0.5, grid_size, 1), minor=True)
+    ax.set_yticks(np.arange(-0.5, grid_size, 1), minor=True)
+    ax.grid(which='minor', color='yellow', linestyle=':', linewidth=0.5)
+
     img = ax.imshow(grid, interpolation='nearest', cmap='viridis', vmin=-1, vmax=2)
-    
+
     # Text objects for metrics
     generation_text = ax.text(0.02, 0.95, '', transform=ax.transAxes, color='white', fontsize=14, fontweight='bold')
     alive_text = ax.text(0.02, 0.90, '', transform=ax.transAxes, color='white', fontsize=12)
     density_text = ax.text(0.02, 0.85, '', transform=ax.transAxes, color='white', fontsize=12)
     stability_text = ax.text(0.02, 0.80, '', transform=ax.transAxes, color='white', fontsize=12)
+    countdown_text = ax.text(0.5, 0.5, '', transform=ax.transAxes, color='white', fontsize=40, ha='center')
+
+    # Pause for 10 seconds and display countdown before starting the animation
+    for i in range(10, 0, -1):
+        countdown_text.set_text(f'Starting in {i} seconds...')
+        plt.draw()
+        plt.pause(1)  # Pause for 1 second
+    countdown_text.set_text('Starting simulation...')
+    plt.draw()
+    plt.pause(1)  # Pause for 1 second to show final message
 
     def update(frame):
         nonlocal grid, previous_grid, stable_generation
@@ -76,10 +97,14 @@ def run_simulation(grid_size, prob_alive, generations):
         img.set_data(grid)
         alive_text.set_text(f'Alive Cells: {alive_count}')
         density_text.set_text(f'Population Density: {density:.2f}')
+
+        # Redraw the grid lines after updating the image
+        ax.grid(which='minor', color='yellow', linestyle=':', linewidth=0.5)
         
         return img, generation_text, alive_text, density_text, stability_text
 
-    ani = animation.FuncAnimation(fig, update, frames=generations, blit=True)
+    ani = animation.FuncAnimation(fig, update, frames=generations, blit=True, interval=50)
+
     plt.show()
 
 if __name__ == "__main__":
